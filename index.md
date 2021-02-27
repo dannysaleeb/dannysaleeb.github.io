@@ -1,37 +1,141 @@
-## Welcome to GitHub Pages
+<!DOCTYPE html>
 
-You can use the [editor on GitHub](https://github.com/dannysaleeb/dannysaleeb.github.io/edit/main/index.md) to maintain and preview the content for your website in Markdown files.
+<html lang="en" style="height: 100%;">
+    <head>
+        <title>Reading Rhythms 2</title>
+    </head>
+    <body style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%;">
+        <div id="exercise-container-one" style="display: flex; margin-bottom: 20px;"></div>
+    </body>
+    <script>
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+        // create array containing all image filenames
+        let imageFiles = [];
+        for (let i = 0; i < 42; i++) {
+            imageFiles.push(`img/tile_${i}.png`);
+        }
 
-### Markdown
+        class Tile {
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+            constructor(image, width, height, startTie, endTie, text, colours) {
+                this.image = image;
+                this.width = width;
+                this.height = height;
+                this.startTie = startTie;
+                this.endTie = endTie;
+                this.text = text;
+                this.colours = colours;
+            }
 
-```markdown
-Syntax highlighted code block
+            render = (target) => {
 
-# Header 1
-## Header 2
-### Header 3
+                let element = document.createElement('div');
+                element.style.backgroundImage = `url(${this.image})`;
+                element.style.backgroundSize = `${this.width} ${this.height}`;
+                element.style.width = this.width;
+                element.style.height = this.height;
+                element.innerHTML = this.text;
+                element.style.backgroundColor = this.colours[this.text % 3];
+                element.style.display = 'flex';
+                element.style.justifyContent = 'center';
+                element.style.alignItems = 'center';
+                target.appendChild(element);
 
-- Bulleted
-- List
+            }
 
-1. Numbered
-2. List
+        }
 
-**Bold** and _Italic_ and `Code` text
+        let tiles = {
+            twoTwo: [],
+            twoFour: [],
+            twoEight: []
+        }
 
-[Link](url) and ![Image](src)
-```
+        // populate twoTwo array in tiles object
+        for (let i = 0; i < 14; i++) {
+            tiles.twoTwo.push(new Tile(imageFiles[i], '140px', '140px', false, false, '', ['#ff0000', '#00ff00', '#0000ff']));
+        }
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+        // populate twoFour array in tiles object
+        for (let i = 14; i < 28; i++) {
+            tiles.twoFour.push(new Tile(imageFiles[i], '140px', '140px', false, false, '', ['#ff0000', '#00ff00', '#0000ff']));
+        }
 
-### Jekyll Themes
+        // populate twoEight array in tiles object
+        for (let i = 28; i < 42; i++) {
+            tiles.twoEight.push(new Tile(imageFiles[i], '140px', '140px', false, false, '', ['#ff0000', '#00ff00', '#0000ff']));
+        }
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/dannysaleeb/dannysaleeb.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+        // two arrays to index tiles that have tie falling on start note and those that end with a tie going out of the tile
+        let endTie = [5,6,7,11,12]
+        let startTie = [8,9,10,11,12]
 
-### Support or Contact
+        // set relevant start tie values to true
+        for (let i = 0; i < startTie.length; i++) {
+            tiles.twoTwo[startTie[i]].startTie = true;
+            tiles.twoFour[startTie[i]].startTie = true;
+            tiles.twoEight[startTie[i]].startTie = true;
+        }
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+        // set relevant end tie values to true
+        for (let i = 0; i < endTie.length; i++) {
+            tiles.twoTwo[endTie[i]].endTie = true;
+            tiles.twoFour[endTie[i]].endTie = true;
+            tiles.twoEight[endTie[i]].endTie = true;
+        }
+
+        // get keys for arrays in tiles object
+        let tilesArrays = Object.keys(tiles);
+
+        // get random index to choose array from tiles object
+        let timeSigIndex = Math.floor(Math.random() * tilesArrays.length);
+
+        // Get six tiles from single array, keeping time sig in position index 0 -- pass in array from tiles object
+        function getSix(tiles) {
+            let finalArray = [tiles[0]];
+            let endTie = false;
+            for (let i = 0; i < 6; i++) {
+                // get a random index between 0 and length of tiles array
+                let randomIndex = Math.floor(Math.random() * tiles.length);
+                if (i === 5 && endTie === true) {
+                    while (finalArray.includes(tiles[randomIndex]) || tiles[randomIndex].endTie === true || tiles[randomIndex].startTie === false) {
+                        randomIndex = Math.floor(Math.random() * tiles.length);
+                    }
+                    finalArray[i+1] = tiles[randomIndex];
+                } else if (i === 5 && endTie === false) {
+                    while (finalArray.includes(tiles[randomIndex]) || tiles[randomIndex].endTie === true || tiles[randomIndex].startTie === true) {
+                        randomIndex = Math.floor(Math.random() * tiles.length);
+                    }
+                    finalArray[i+1] = tiles[randomIndex];
+                } else if (endTie === false) {
+                    // while finalArray already includes the tile at that random index, keep getting random indices
+                    while (finalArray.includes(tiles[randomIndex]) || tiles[randomIndex].startTie === true) {
+                        randomIndex = Math.floor(Math.random() * tiles.length);
+                    }
+                    finalArray[i+1] = tiles[randomIndex];
+                    if (tiles[randomIndex].endTie === true) {
+                        endTie = true;
+                    }
+                } else {
+                    while (finalArray.includes(tiles[randomIndex]) || tiles[randomIndex].startTie === false) {
+                        randomIndex = Math.floor(Math.random() * tiles.length);
+                    }
+                    finalArray[i+1] = tiles[randomIndex];
+                    if (tiles[randomIndex].endTie === false) {
+                        endTie = false;
+                    }
+                }
+            }
+
+            return finalArray;
+        }
+
+
+        let chosenTiles = getSix(tiles[tilesArrays[timeSigIndex]]);
+
+        for (let i = 0; i < 7; i++) {
+            chosenTiles[i].render(document.querySelector('#exercise-container-one'));
+        }
+
+    </script>
+</html>
