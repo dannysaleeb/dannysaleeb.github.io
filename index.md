@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-
 <html lang="en" style="height: 100%;">
     <head>
         <title>Reading Rhythms 2</title>
